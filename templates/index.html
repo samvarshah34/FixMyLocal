@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FixMyLocal</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 1rem; }
+    button { margin: 0.5rem 0; }
+  </style>
+</head>
+<body>
+  <h1>🛠️ FixMyLocal</h1>
+  <hr/>
+  <button onclick="location.href='/map'" style="margin-top: 1rem;">🗺️ View Report Map</button>
+  <form id="reportForm" action="/submit" method="post">
+    <label for="type">Issue Type:</label><br/>
+    <select name="type" id="type" required>
+      <option value="">– select –</option>
+      <option value="Water">Water</option>
+      <option value="Road">Road</option>
+      <option value="Electricity">Electricity</option>
+      <option value="Other">Other</option>
+    </select><br/><br/>
+
+    <label for="status">Status:</label><br/>
+    <select name="status" id="status" required>
+      <option value="unresolved">Unresolved</option>
+      <option value="resolved">Resolved</option>
+    </select><br/><br/>
+
+    <label for="lang">Language:</label><br/>
+    <select id="lang">
+      <option value="en-US">English</option>
+      <option value="hi-IN">Hindi</option>
+      <option value="mr-IN">Marathi</option>
+    </select><br/><br/>
+
+    <label for="desc">Description:</label><br/>
+    <textarea name="desc" id="desc" rows="4" placeholder="Type or record your issue..." required></textarea><br/>
+
+    <button type="button" id="startRec">🎤 Start Recording</button>
+    <button type="button" id="stopRec" disabled>⏹ Stop & Insert</button><br/><br/>
+
+    <input type="hidden" name="lat" id="lat"/>
+    <input type="hidden" name="lng" id="lng"/>
+
+    <button type="submit">Submit Report</button>
+  </form>
+
+  <p id="statusText"></p>
+
+  <script>
+    // Geolocation
+    window.onload = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          document.getElementById('lat').value = pos.coords.latitude;
+          document.getElementById('lng').value = pos.coords.longitude;
+        }, () => {
+          document.getElementById('statusText').textContent = '⚠️ Could not get location';
+        });
+      }
+    };
+
+    // Voice input
+    let recog, recording = false;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recog = new SpeechRec();
+      recog.interimResults = false;
+      recog.continuous = false;
+
+      recog.onresult = (e) => {
+        const text = e.results[0][0].transcript;
+        document.getElementById('desc').value += (document.getElementById('desc').value ? ' ' : '') + text;
+      };
+      recog.onerror = (e) => {
+        document.getElementById('statusText').textContent = '🎙️ Error: ' + e.error;
+      };
+      recog.onend = () => {
+        recording = false;
+        document.getElementById('startRec').disabled = false;
+        document.getElementById('stopRec').disabled = true;
+      };
+    } else {
+      document.getElementById('statusText').textContent = '⚠️ Speech API not supported';
+      document.getElementById('startRec').disabled = true;
+    }
+
+    document.getElementById('startRec').onclick = () => {
+      if (!recording) {
+        recog.lang = document.getElementById('lang').value; // Get language
+        recog.start();
+        recording = true;
+        document.getElementById('startRec').disabled = true;
+        document.getElementById('stopRec').disabled = false;
+        document.getElementById('statusText').textContent = '🎙️ Recording...';
+      }
+    };
+
+    document.getElementById('stopRec').onclick = () => {
+      if (recording) {
+        recog.stop();
+        document.getElementById('statusText').textContent = '🎙️ Processing...';
+      }
+    };
+  </script>
+</body>
+</html>
