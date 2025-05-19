@@ -8,116 +8,205 @@
     body { margin: 0; font-family: sans-serif; }
     #map { height: 90vh; width: 100vw; }
     #legend, #filterBox {
-      padding: 0.5rem;
-      background: #fff;
-      position: absolute;
-      z-index: 1000;
-      margin: 1rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      padding: 0.5rem; background: #fff; position: absolute; z-index: 1000;
+      margin: 1rem; border-radius: 0.5rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     #legend { bottom: 1rem; left: 1rem; }
     #filterBox { top: 1rem; left: 1rem; }
     table { border-collapse: collapse; }
     td { padding: 4px 8px; vertical-align: middle; }
-    .color-box {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 1px solid #888;
-      margin-right: 5px;
+    .color-box { display: inline-block; width: 16px; height: 16px; border: 1px solid #888; margin-right: 5px; }
+
+    /* Modal styles */
+    #userModal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; justify-content: center; align-items: center; z-index: 2000;
     }
+    #userModalContent {
+      background: white; padding: 1.5rem 2rem; border-radius: 0.5rem;
+      max-width: 320px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    #userModalContent button {
+      margin: 0.5rem; padding: 0.5rem 1.5rem; font-size: 1rem; border: none;
+      border-radius: 0.3rem; cursor: pointer; color: white; transition: background-color 0.3s;
+    }
+    #btnViewer { background: #3b82f6; }
+    #btnViewer:hover { background: #2563eb; }
+    #btnNgo    { background: #10b981; }
+    #btnNgo:hover    { background: #059669; }
   </style>
 </head>
 <body>
 
-<div id="map"></div>
+  <div id="map"></div>
 
-<div id="filterBox">
-  <label for="filterSelect"><b>Filter by Issue:</b></label>
-  <select id="filterSelect">
-    <option value="All">All</option>
-    <option value="Water">Water</option>
-    <option value="Road">Road</option>
-    <option value="Electricity">Electricity</option>
-    <option value="Other">Other</option>
-  </select>
-</div>
+  <div id="filterBox">
+    <label for="filterSelect"><b>Filter by Issue:</b></label>
+    <select id="filterSelect">
+      <option value="All">All</option>
+      <option value="Water">Water</option>
+      <option value="Road">Road</option>
+      <option value="Electricity">Electricity</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
 
-<div id="legend">
-  <b>Legend:</b>
-  <table>
-    <tr><td><div class="color-box" style="background:blue"></div></td><td>Water</td></tr>
-    <tr><td><div class="color-box" style="background:orange"></div></td><td>Road</td></tr>
-    <tr><td><div class="color-box" style="background:red"></div></td><td>Electricity</td></tr>
-    <tr><td><div class="color-box" style="background:green"></div></td><td>Other</td></tr>
-    <tr><td><div class="color-box" style="background:gold"></div></td><td>Resolved</td></tr>
-  </table>
-</div>
+  <div id="legend">
+    <b>Legend:</b>
+    <table>
+      <tr><td><div class="color-box" style="background:blue"></div></td><td>Water</td></tr>
+      <tr><td><div class="color-box" style="background:orange"></div></td><td>Road</td></tr>
+      <tr><td><div class="color-box" style="background:red"></div></td><td>Electricity</td></tr>
+      <tr><td><div class="color-box" style="background:green"></div></td><td>Other</td></tr>
+      <tr><td><div class="color-box" style="background:gold"></div></td><td>Resolved</td></tr>
+    </table>
+  </div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  const map = L.map('map').setView([20.5937, 78.9629], 5); // India center
+  <!-- User type modal -->
+  <div id="userModal">
+    <div id="userModalContent">
+      <h2>Select User Type</h2>
+      <p>Are you a Viewer or an NGO?</p>
+      <button id="btnViewer">Viewer</button>
+      <button id="btnNgo">NGO</button>
+    </div>
+  </div>
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    let user = urlParams.get('user');
 
-  const iconColors = {
-    Water: 'blue',
-    Road: 'orange',
-    Electricity: 'red',
-    Other: 'green'
-  };
+    const modal   = document.getElementById('userModal');
+    const btnViewer = document.getElementById('btnViewer');
+    const btnNgo    = document.getElementById('btnNgo');
 
-  function getIcon(type, status) {
-    const color = (status === 'resolved') ? 'gold' : iconColors[type] || 'gray';  // Use 'gold' for resolved issues
+    if (!user) {
+      modal.style.display = 'flex';
+    } else {
+      modal.style.display = 'none';
+      initMap(user);
+    }
 
-    return L.icon({
-      iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
-      iconSize: [25, 41], // Same size for all markers
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
-      shadowSize: [41, 41]
-    });
-  }
+    btnViewer.onclick = () => {
+      user = 'viewer';
+      modal.style.display = 'none';
+      window.history.replaceState({}, '', window.location.pathname + '?user=' + user);
+      initMap(user);
+    };
 
-  let allMarkers = [];
+    btnNgo.onclick = () => {
+      user = 'ngo';
+      modal.style.display = 'none';
+      window.history.replaceState({}, '', window.location.pathname + '?user=' + user);
+      initMap(user);
+    };
 
-  function updateMarkers(filterType) {
-    allMarkers.forEach(marker => map.removeLayer(marker));
-    allMarkers = [];
+    function initMap(user) {
+      const map = L.map('map').setView([20.5937, 78.9629], 5);
 
-    fetch('/data')
-      .then(res => res.json())
-      .then(reports => {
-        reports.forEach(report => {
-          if (filterType !== 'All' && report.type !== filterType) return;
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
 
-          const marker = L.marker([report.lat, report.lng], {
-            icon: getIcon(report.type, report.status)
-          }).addTo(map);
+      const iconColors = {
+        Water: 'blue',
+        Road: 'orange',
+        Electricity: 'red',
+        Other: 'green'
+      };
 
-          marker.bindPopup(`
-            <b>${report.type}</b><br/>
-            ${report.description}<br/>
-            <i>Status: ${report.status}</i><br/>
-            <small>${new Date(report.timestamp).toLocaleString()}</small>
-          `);
-          allMarkers.push(marker);
+      function getIcon(type, status) {
+        const color = status === 'resolved' ? 'gold' : iconColors[type] || 'gray';
+        return L.icon({
+          iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
+          iconSize: [25,41], iconAnchor: [12,41], popupAnchor: [1,-34],
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
+          shadowSize: [41,41]
         });
-      });
-  }
+      }
 
-  document.getElementById('filterSelect').addEventListener('change', () => {
-    const selected = document.getElementById('filterSelect').value;
-    updateMarkers(selected);
-  });
+      let allMarkers = [];
 
-  // Load all on start
-  updateMarkers('All');
-</script>
+      function updateMarkers(filterType) {
+        allMarkers.forEach(m => map.removeLayer(m));
+        allMarkers = [];
 
+        fetch('/data')
+          .then(r => r.json())
+          .then(reports => {
+            reports.forEach(report => {
+              if (filterType !== 'All' && report.type !== filterType) return;
+
+              const marker = L.marker([report.lat, report.lng], {
+                icon: getIcon(report.type, report.status)
+              }).addTo(map);
+
+              let popupHtml = `
+                <b>${report.type}</b><br/>
+                ${report.description}<br/>
+                <i>Status: <span class="status-text">${report.status}</span></i><br/>
+                <small>${new Date(report.timestamp).toLocaleString()}</small>
+              `;
+
+              if (user === 'ngo') {
+                const nextStatus = report.status === 'resolved' ? 'unresolved' : 'resolved';
+                popupHtml += `<br/><button class="toggle-status-btn" style="margin-top:6px;padding:4px 8px;cursor:pointer;">
+                  Mark as ${nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
+                </button>`;
+              }
+
+              marker.bindPopup(popupHtml);
+
+              if (user === 'ngo') {
+                marker.on('popupopen', () => {
+                  const popup = marker.getPopup();
+                  const container = popup.getElement();
+                  const btn = container.querySelector('.toggle-status-btn');
+                  const statusSpan = container.querySelector('.status-text');
+
+                  if (!btn) return;
+
+                  btn.onclick = () => {
+                    const newStatus = report.status === 'resolved' ? 'unresolved' : 'resolved';
+
+                    fetch('/api/update_status', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        lat: report.lat,
+                        lng: report.lng,
+                        timestamp: report.timestamp,
+                        status: newStatus
+                      })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                      if (data.success) {
+                        report.status = newStatus;
+                        statusSpan.textContent = newStatus;
+                        marker.setIcon(getIcon(report.type, newStatus));
+                        btn.textContent = `Mark as ${newStatus === 'resolved' ? 'Unresolved' : 'Resolved'}`;
+                      } else {
+                        alert('Failed to update: ' + (data.error || 'Unknown'));
+                      }
+                    })
+                    .catch(() => alert('Error updating status'));
+                  };
+                });
+              }
+
+              allMarkers.push(marker);
+            });
+          });
+      }
+
+      document.getElementById('filterSelect').onchange = () => {
+        updateMarkers(document.getElementById('filterSelect').value);
+      };
+
+      updateMarkers('All');
+    }
+  </script>
 </body>
 </html>
