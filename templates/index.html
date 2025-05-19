@@ -1,110 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FixMyLocal</title>
-  <style>
-    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 1rem; }
-    button { margin: 0.5rem 0; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FixMyLocal 🛠️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>🛠️ FixMyLocal</h1>
-  <hr/>
-  <button onclick="location.href='/map'" style="margin-top: 1rem;">🗺️ View Report Map</button>
-  <form id="reportForm" action="/submit" method="post">
-    <label for="type">Issue Type:</label><br/>
-    <select name="type" id="type" required>
-      <option value="">– select –</option>
-      <option value="Water">Water</option>
-      <option value="Road">Road</option>
-      <option value="Electricity">Electricity</option>
-      <option value="Other">Other</option>
-    </select><br/><br/>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
 
-    <label for="status">Status:</label><br/>
-    <select name="status" id="status" required>
-      <option value="unresolved">Unresolved</option>
-      <option value="resolved">Resolved</option>
-    </select><br/><br/>
+  <header class="max-w-3xl mx-auto px-6 py-8">
+    <h1 class="text-4xl font-extrabold mb-2 flex items-center gap-3">
+      🛠️ <span>FixMyLocal</span>
+    </h1>
+    <p class="text-gray-600">Report local issues quickly & easily</p>
+  </header>
 
-    <label for="lang">Language:</label><br/>
-    <select id="lang">
-      <option value="en-US">English</option>
-      <option value="hi-IN">Hindi</option>
-      <option value="mr-IN">Marathi</option>
-    </select><br/><br/>
+  <main class="flex-grow max-w-3xl mx-auto px-6 w-full">
+    <div class="flex justify-end mb-6">
+      <button
+        onclick="location.href='/map'"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
+        aria-label="View Report Map"
+      >
+        🗺️ View Report Map
+      </button>
+    </div>
 
-    <label for="desc">Description:</label><br/>
-    <textarea name="desc" id="desc" rows="4" placeholder="Type or record your issue..." required></textarea><br/>
+    <form id="reportForm" action="/submit" method="post" novalidate class="bg-white rounded-lg shadow p-6 space-y-6">
+      <!-- Issue Type -->
+      <fieldset class="space-y-2">
+        <label for="type" class="block font-semibold text-sm">Issue Type <span class="text-red-500">*</span></label>
+        <select name="type" id="type" required
+          class="w-full rounded border border-gray-300 bg-gray-50 text-gray-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option value="" disabled selected>– Select issue type –</option>
+          <option value="Water">Water</option>
+          <option value="Road">Road</option>
+          <option value="Electricity">Electricity</option>
+          <option value="Other">Other</option>
+        </select>
+        <p class="text-red-500 text-sm hidden" id="typeError">Please select an issue type.</p>
+      </fieldset>
 
-    <button type="button" id="startRec">🎤 Start Recording</button>
-    <button type="button" id="stopRec" disabled>⏹ Stop & Insert</button><br/><br/>
+      <!-- Status -->
+      <fieldset class="space-y-2">
+        <label for="status" class="block font-semibold text-sm">Status <span class="text-red-500">*</span></label>
+        <select name="status" id="status" required
+          class="w-full rounded border border-gray-300 bg-gray-50 text-gray-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option value="unresolved">Unresolved</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </fieldset>
 
-    <input type="hidden" name="lat" id="lat"/>
-    <input type="hidden" name="lng" id="lng"/>
+      <!-- Language -->
+      <fieldset class="space-y-2">
+        <label for="lang" class="block font-semibold text-sm">Language (for voice input)</label>
+        <select id="lang" class="w-full rounded border border-gray-300 bg-gray-50 text-gray-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="en-US">English</option>
+          <option value="hi-IN">Hindi</option>
+          <option value="mr-IN">Marathi</option>
+        </select>
+      </fieldset>
 
-    <button type="submit">Submit Report</button>
-  </form>
+      <!-- Description -->
+      <fieldset class="space-y-2">
+        <label for="desc" class="block font-semibold text-sm">Description <span class="text-red-500">*</span></label>
+        <textarea name="desc" id="desc" rows="4" placeholder="Type or record your issue..." required
+          class="w-full rounded border border-gray-300 bg-gray-50 text-gray-900 px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-blue-400"
+        ></textarea>
+        <p class="text-red-500 text-sm hidden" id="descError">Description cannot be empty.</p>
+      </fieldset>
 
-  <p id="statusText"></p>
+      <!-- Voice recording controls -->
+      <div class="flex gap-3 items-center">
+        <button
+          type="button"
+          id="startRec"
+          class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded shadow focus:outline-none focus:ring-2 focus:ring-green-400"
+          aria-label="Start voice recording"
+        >
+          🎤 Start Recording
+        </button>
 
-  <script>
-    // Geolocation
-    window.onload = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-          document.getElementById('lat').value = pos.coords.latitude;
-          document.getElementById('lng').value = pos.coords.longitude;
-        }, () => {
-          document.getElementById('statusText').textContent = '⚠️ Could not get location';
-        });
-      }
-    };
+        <button
+          type="button"
+          id="stopRec"
+          disabled
+          class="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded shadow focus:outline-none focus:ring-2 focus:ring-red-400"
+          aria-label="Stop and insert recording"
+        >
+          ⏹ Stop & Insert
+        </button>
 
-    // Voice input
-    let recog, recording = false;
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recog = new SpeechRec();
-      recog.interimResults = false;
-      recog.continuous = false;
+        <span id="recStatus" class="ml-3 text-sm font-medium text-gray-700"></span>
+        <span id="timer" class="ml-3 font-mono text-sm text-blue-600"></span>
+      </div>
 
-      recog.onresult = (e) => {
-        const text = e.results[0][0].transcript;
-        document.getElementById('desc').value += (document.getElementById('desc').value ? ' ' : '') + text;
-      };
-      recog.onerror = (e) => {
-        document.getElementById('statusText').textContent = '🎙️ Error: ' + e.error;
-      };
-      recog.onend = () => {
-        recording = false;
-        document.getElementById('startRec').disabled = false;
-        document.getElementById('stopRec').disabled = true;
-      };
-    } else {
-      document.getElementById('statusText').textContent = '⚠️ Speech API not supported';
-      document.getElementById('startRec').disabled = true;
-    }
+      <!-- Submit -->
+      <button
+        type="submit"
+        id="submitBtn"
+        class="w-full mt-4 px-4 py-3 bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-semibold rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+      >
+        Submit Report
+      </button>
 
-    document.getElementById('startRec').onclick = () => {
-      if (!recording) {
-        recog.lang = document.getElementById('lang').value; // Get language
-        recog.start();
-        recording = true;
-        document.getElementById('startRec').disabled = true;
-        document.getElementById('stopRec').disabled = false;
-        document.getElementById('statusText').textContent = '🎙️ Recording...';
-      }
-    };
+    </form>
+  </main>
 
-    document.getElementById('stopRec').onclick = () => {
-      if (recording) {
-        recog.stop();
-        document.getElementById('statusText').textContent = '🎙️ Processing...';
-      }
-    };
-  </script>
+  <footer class="max-w-3xl mx-auto px-6 py-6 text-center text-gray-500 text-sm select-none">
+    &copy; 2025 FixMyLocal
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" aria-live="polite" aria-atomic="true" class="fixed bottom-8 right-8 max-w-xs z-50 hidden">
+    <div id="toastMsg" class="bg-gray-800 text-white px-5 py-3 rounded shadow-lg"></div>
+  </div>
+
+  <script src="{{ url_for('static', filename='fixmylocal.js') }}" defer></script>
+
 </body>
 </html>

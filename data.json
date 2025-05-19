@@ -46,5 +46,37 @@
     "lng": "67.6992683342604",
     "status": "unresolved",
     "timestamp": "2025-05-11T12:14:34.802228"
+  },
+  {
+    "type": "Water",
+    "description": "ORZ TALKS",
+    "lat": "43.030530344671512",
+    "lng": "77.69935273159129",
+    "status": "resolved",
+    "timestamp": "2025-05-15T05:24:04.162400"
+  },
+  {
+    "type": "Water",
+    "description": "hello I am here reporting a water issue in Vizag  that's great the water supply has reduced to 10 litres per year  please help thanks",
+    "lat": "18.030501070869013",
+    "lng": "82.69938199919127",
+    "status": "unresolved",
+    "timestamp": "2025-05-15T06:28:05.026976"
+  },
+  {
+    "type": "Electricity",
+    "description": "hello there is a problem here and we are unable to get good electric city supply  can you please send somebody to fix it",
+    "lat": "13.030561224723884",
+    "lng": "77.69939759003111",
+    "status": "unresolved",
+    "timestamp": "2025-05-15T06:35:52.270321"
+  },
+  {
+    "type": "Road",
+    "description": "Broken road",
+    "lat": "14.07412756381517",
+    "lng": "78.85461425781251",
+    "status": "unresolved",
+    "timestamp": "2025-05-15T07:21:24.079964"
   }
 ]

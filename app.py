@@ -6,7 +6,7 @@ from datetime import datetime
 app = Flask(__name__)
 DATA_FILE = "data.json"
 
-# Ensure the data file exists
+# Ensure data file exists
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, "w") as f:
         json.dump([], f)
@@ -21,7 +21,7 @@ def submit():
     description = request.form.get("desc")
     lat = request.form.get("lat")
     lng = request.form.get("lng")
-    status = request.form.get("status")  # 'resolved' or 'unresolved'
+    status = request.form.get("status")
 
     new_report = {
         "type": issue_type,
@@ -51,4 +51,4 @@ def get_data():
     return jsonify(data)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)))
