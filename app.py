@@ -2,9 +2,13 @@ from flask import Flask, request, render_template, redirect, jsonify
 import json
 import os
 from datetime import datetime
+import random
 
 app = Flask(__name__)
 DATA_FILE = "data.json"
+
+# Temporary in-memory OTP storage
+otp_store = {}
 
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, "w") as f:
@@ -80,5 +84,41 @@ def update_status():
     save_data(data)
     return jsonify({"success": True})
 
+
+
+# === New OTP API endpoints ===
+
+@app.route("/api/send_otp", methods=["POST"])
+def send_otp():
+    data = request.get_json()
+    email = data.get("email")
+    if not email or "@" not in email:
+        return jsonify(success=False, error="Invalid email"), 400
+
+    # Generate 6-digit OTP
+    otp = f"{random.randint(100000, 999999)}"
+    otp_store[email] = otp
+
+    # Print OTP to console for testing (replace with real email sending)
+    print(f"[OTP] Sending OTP {otp} to email {email}")
+
+    return jsonify(success=True)
+
+@app.route("/api/verify_otp", methods=["POST"])
+def verify_otp():
+    data = request.get_json()
+    email = data.get("email")
+    otp = data.get("otp")
+
+    if not email or not otp:
+        return jsonify(success=False, error="Missing email or OTP"), 400
+
+    if otp_store.get(email) == otp:
+        otp_store.pop(email)  # Remove OTP after successful verification
+        return jsonify(success=True)
+    else:
+        return jsonify(success=False, error="Invalid OTP"), 400
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)), debug=True)
