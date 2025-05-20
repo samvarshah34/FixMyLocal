@@ -20,7 +20,7 @@
     "description": "electricity out",
     "lat": "19.030444506485866",
     "lng": "77.69934742744616",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-11T11:17:52.367894"
   },
   {
@@ -60,7 +60,7 @@
     "description": "hello I am here reporting a water issue in Vizag  that's great the water supply has reduced to 10 litres per year  please help thanks",
     "lat": "18.030501070869013",
     "lng": "82.69938199919127",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-15T06:28:05.026976"
   },
   {
