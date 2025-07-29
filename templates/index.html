@@ -51,19 +51,21 @@
     <form id="reportForm" action="/submit" method="post" novalidate
       class="bg-white/30 dark:bg-gray-800/50 backdrop-blur-md rounded-xl shadow-xl p-8 space-y-6 border border-gray-200 dark:border-gray-700">
 
-      <!-- Issue Type -->
-      <div class="relative">
-        <label for="type" class="absolute text-sm px-2 bg-white dark:bg-gray-800 left-3 -top-2 text-blue-600 dark:text-blue-400">Issue Type *</label>
-        <select name="type" id="type" required
-          class="w-full mt-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <option value="" disabled selected>– Select issue type –</option>
-          <option value="Water">Water</option>
-          <option value="Road">Road</option>
-          <option value="Electricity">Electricity</option>
-          <option value="Other">Other</option>
-        </select>
-        <p class="text-red-500 text-sm hidden" id="typeError">Please select an issue type.</p>
-      </div>
+    <!-- Issue Type -->
+    <div class="relative">
+      <label for="type" class="absolute text-sm px-2 bg-white dark:bg-gray-800 left-3 -top-2 text-blue-600 dark:text-blue-400">
+        Assistance Type *
+      </label>
+      <select name="type" id="type" required
+        class="w-full mt-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <option value="" disabled selected>– Select assistance –</option>
+        <option value="Food Assistance">Food Assistance</option>
+        <option value="Medical Help">Medical Help</option>
+        <option value="Education Support">Education Support</option>
+        <option value="Shelter or Clothing">Shelter or Clothing</option>
+      </select>
+      <p class="text-red-500 text-sm hidden" id="typeError">Please select an assistance type.</p>
+    </div>
 
       <!-- Status -->
       <div class="relative">

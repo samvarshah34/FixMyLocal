@@ -36,6 +36,57 @@
       background: rgba(255, 255, 255, 0.95);
     }
 
+    /* Positioning and styling filter box and legend */
+    #filterBox {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(255 255 255 / 0.85);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      z-index: 1000;
+      font-weight: 600;
+    }
+    #filterBox label {
+      margin-right: 0.5rem;
+    }
+    #filterSelect {
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.3rem;
+      border: 1px solid #ccc;
+    }
+
+    #legend {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      background: rgba(255 255 255 / 0.85);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      z-index: 1000;
+      font-size: 0.875rem;
+    }
+    #legend strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    #legend div > span {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+      border-radius: 0.15rem;
+    }
+    .bg-blue-500 { background-color: #3b82f6; }
+    .bg-red-500 { background-color: #ef4444; }
+    .bg-green-500 { background-color: #22c55e; }
+    .bg-purple-500 { background-color: #a855f7; }
+    .bg-yellow-400 { background-color: #facc15; }
+
     /* New: email verification modal */
     #emailModal {
       position: fixed; inset:0; background: rgba(0,0,0,0.6);
@@ -52,26 +103,26 @@
   <div id="map" class="z-0"></div>
 
   <!-- Filter Box -->
-  <div id="filterBox" class="absolute top-6 left-6 z-50 bg-white/30 dark:bg-gray-800/50 backdrop-blur-md shadow-lg rounded-lg p-4 border border-gray-300 dark:border-gray-700">
-    <label for="filterSelect" class="block font-semibold text-sm text-gray-800 dark:text-gray-100 mb-1">Filter by Issue:</label>
-    <select id="filterSelect" class="w-40 px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:outline-none">
+  <div id="filterBox">
+    <label for="filterSelect">Filter by Assistance:</label>
+    <select id="filterSelect">
       <option value="All">All</option>
-      <option value="Water">Water</option>
-      <option value="Road">Road</option>
-      <option value="Electricity">Electricity</option>
-      <option value="Other">Other</option>
+      <option value="Food Assistance">Food Assistance</option>
+      <option value="Medical Help">Medical Help</option>
+      <option value="Education Support">Education Support</option>
+      <option value="Shelter or Clothing">Shelter or Clothing</option>
     </select>
   </div>
 
   <!-- Legend -->
-  <div id="legend" class="absolute bottom-6 left-6 z-50 bg-white/30 dark:bg-gray-800/50 backdrop-blur-md shadow-lg rounded-lg p-4 border border-gray-300 dark:border-gray-700">
-    <strong class="block mb-2">Legend:</strong>
+  <div id="legend">
+    <strong>Legend:</strong>
     <div class="text-sm space-y-1">
-      <div><span class="inline-block w-4 h-4 bg-blue-500 border border-gray-700 mr-2"></span>Water</div>
-      <div><span class="inline-block w-4 h-4 bg-orange-500 border border-gray-700 mr-2"></span>Road</div>
-      <div><span class="inline-block w-4 h-4 bg-red-500 border border-gray-700 mr-2"></span>Electricity</div>
-      <div><span class="inline-block w-4 h-4 bg-green-500 border border-gray-700 mr-2"></span>Other</div>
-      <div><span class="inline-block w-4 h-4 bg-yellow-400 border border-gray-700 mr-2"></span>Resolved</div>
+      <div><span class="bg-blue-500"></span> Food Assistance</div>
+      <div><span class="bg-red-500"></span> Medical Help</div>
+      <div><span class="bg-green-500"></span> Education Support</div>
+      <div><span class="bg-purple-500"></span> Shelter or Clothing</div>
+      <div><span class="bg-yellow-400"></span> Resolved</div>
     </div>
   </div>
 
@@ -127,15 +178,26 @@
     const map = L.map('map').setView([20.5937,78.9629],5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution: '© OpenStreetMap contributors' })
      .addTo(map);
+
     const allMarkers = [];
-    const iconColors = { Water:'blue',Road:'orange',Electricity:'red',Other:'green' };
-    function getIcon(type,status){
-      const c = status==='resolved'?'gold':iconColors[type]||'gray';
-      return L.icon({ iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${c}.png`,iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34],shadowUrl:'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',shadowSize:[41,41] });
+    const iconColors = {
+      "Food Assistance": "blue",
+      "Medical Help": "red",
+      "Education Support": "green",
+      "Shelter or Clothing": "purple"
+    };
+    function getIcon(type, status){
+      const c = status==='resolved'?'yellow':iconColors[type] || 'gray';
+      return L.icon({
+        iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${c}.png`,
+        iconSize:[25,41], iconAnchor:[12,41], popupAnchor:[1,-34],
+        shadowUrl:'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png', shadowSize:[41,41]
+      });
     }
 
     function updateMarkers(filterType){
-      allMarkers.forEach(m=>map.removeLayer(m)); allMarkers.length=0;
+      allMarkers.forEach(m=>map.removeLayer(m));
+      allMarkers.length=0;
       fetch('/data').then(r=>r.json()).then(reports=>{
         reports.forEach(report=>{
           if(filterType!=='All' && report.type!==filterType) return;
@@ -151,9 +213,13 @@
               const c = m.getPopup().getElement();
               const btn = c.querySelector('.toggle-status-btn');
               const sp  = c.querySelector('.status-text');
-              btn&& (btn.onclick=()=>{
+              btn && (btn.onclick=()=>{
                 const ns= report.status==='resolved'?'unresolved':'resolved';
-                fetch('/api/update_status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:report.lat,lng:report.lng,timestamp:report.timestamp,status:ns})})
+                fetch('/api/update_status',{
+                  method:'POST',
+                  headers:{'Content-Type':'application/json'},
+                  body:JSON.stringify({lat:report.lat,lng:report.lng,timestamp:report.timestamp,status:ns})
+                })
                 .then(r=>r.json()).then(res=>{
                   if(res.success){
                     report.status=ns; sp.textContent=ns; m.setIcon(getIcon(report.type,ns));
@@ -220,22 +286,37 @@
       fetch('/api/verify_otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,otp})})
       .then(r=>r.json()).then(d=>{
         if(d.success){
-          localStorage.setItem('verifiedNgoEmail',email);
+          emailModal.style.display='none';
           initializeMap();
+          // Show email on map page top-right
+          let div = document.getElementById('ngoEmailDisplay');
+          if(!div){
+            div = document.createElement('div');
+            div.id = 'ngoEmailDisplay';
+            div.className = 'fixed top-2 right-2 bg-green-700 text-white px-3 py-1 rounded z-1000 text-sm font-semibold';
+            document.body.appendChild(div);
+          }
+          div.textContent = `Logged in as NGO: ${email}`;
         } else {
-          otpErr.textContent=d.error||'Invalid OTP'; otpErr.classList.remove('hidden');
+          otpErr.textContent = d.error || 'Invalid OTP';
+          otpErr.classList.remove('hidden');
         }
       }).catch(()=>{
         otpErr.textContent='Server error'; otpErr.classList.remove('hidden');
       });
     };
 
-    // On load
-    if(!user){
-      userModal.style.display='flex';
-    } else {
+    // On page load, if user param present, skip user modal
+    if(user==='viewer'){
       initializeMap();
+      userModal.style.display='none';
+    } else if(user==='ngo'){
+      userModal.style.display='none';
+      emailModal.style.display='flex';
+    } else {
+      userModal.style.display='flex';
     }
   </script>
+
 </body>
 </html>

@@ -4,7 +4,7 @@
     "description": "\u092e\u0947\u0930\u093e \u0928\u093e\u092e \u0938\u093e\u0902\u092d\u0930 \u0939\u0948",
     "lat": "23.030444506485866",
     "lng": "77.69934742744616",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-11T11:16:46.914717"
   },
   {
@@ -12,7 +12,7 @@
     "description": "hi",
     "lat": "13.030444506485866",
     "lng": "71.69934742744616",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-11T11:17:52.367894"
   },
   {
@@ -28,7 +28,7 @@
     "description": "road broken",
     "lat": "19.030444506485866",
     "lng": "57.69934742744616",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-11T11:17:52.367894"
   },
   {
@@ -44,7 +44,7 @@
     "description": "\u0905\u0924\u093f\u0925\u0940 \u0932\u092f \u092a\u094d\u0930\u0949\u092c\u094d\u0932\u0947\u092e \u091d\u093e\u0932\u093e\u092f \u092e\u094d\u0939\u0923\u091c\u0947 \u0924\u0947 \u0930\u093e\u0938\u094d\u0924\u0947 \u0906\u0939\u0947 \u0924\u0947 \u0905\u0938\u0947 \u0924\u0941\u091f\u0942\u0928 \u0917\u0947\u0932\u0947 \u0906\u0923\u093f \u0915\u093e\u092f \u0915\u0930\u0942 \u0906\u0924\u093e \u091a\u093e\u0932\u0923\u093e\u0930 \u0906\u0939\u0947 \u092a\u0923 \u0939\u094b\u0924 \u0928\u093e\u0939\u0940 \u0924\u0930 \u0915\u0941\u0923\u0940\u0924\u0930\u0940 \u092c\u0918\u093f\u0924\u0932\u093e \u0906\u0923\u093f \u092f\u093e\u0932\u093e \u091a\u0947\u0902\u091c \u0915\u0947\u0932\u093e \u0930\u093f\u092a\u0947\u0905\u0930 \u0915\u0947\u0932\u093e \u0924\u0930 \u0932\u092f \u091b\u093e\u0928 \u0939\u094b\u0908\u0932",
     "lat": "33.030293933665794",
     "lng": "67.6992683342604",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-11T12:14:34.802228"
   },
   {
@@ -68,15 +68,31 @@
     "description": "hello there is a problem here and we are unable to get good electric city supply  can you please send somebody to fix it",
     "lat": "13.030561224723884",
     "lng": "77.69939759003111",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-15T06:35:52.270321"
   },
   {
-    "type": "Road",
+    "type": "Food Assistance",
     "description": "Broken road",
     "lat": "14.07412756381517",
     "lng": "78.85461425781251",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-15T07:21:24.079964"
+  },
+  {
+    "type": "Road",
+    "description": "hi",
+    "lat": null,
+    "lng": null,
+    "status": "unresolved",
+    "timestamp": "2025-05-22T05:07:40.554439"
+  },
+  {
+    "type": "Road",
+    "description": "hi",
+    "lat": null,
+    "lng": null,
+    "status": "unresolved",
+    "timestamp": "2025-05-22T05:16:04.214904"
   }
 ]
