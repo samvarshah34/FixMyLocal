@@ -60,7 +60,7 @@
     "description": "hello I am here reporting a water issue in Vizag  that's great the water supply has reduced to 10 litres per year  please help thanks",
     "lat": "18.030501070869013",
     "lng": "82.69938199919127",
-    "status": "resolved",
+    "status": "unresolved",
     "timestamp": "2025-05-15T06:28:05.026976"
   },
   {
@@ -78,5 +78,13 @@
     "lng": "78.85461425781251",
     "status": "resolved",
     "timestamp": "2025-05-15T07:21:24.079964"
+  },
+  {
+    "type": "Medical Help",
+    "description": "\u092e\u0941\u091d\u0947 \u092e\u0947\u0921\u093f\u0915\u0932 \u0939\u0947\u0932\u094d\u092a \u0915\u0940 \u091c\u0930\u0942\u0930\u0924 \u0939\u0948",
+    "lat": "24.07412756381517",
+    "lng": "98.85461425781251",
+    "status": "resolved",
+    "timestamp": "2025-08-01T15:50:15.106874"
   }
 ]

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SwiftPatch Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+  <style>
+    #heatmap {
+      height: 400px;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 min-h-screen text-gray-800 p-6">
+
+  <!-- Header -->
+  <header class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">📊 SwiftPatch Reports</h1>
+    <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">← Back to Home</a>
+  </header>
+
+  <!-- Grid of Charts -->
+  <section class="grid gap-8 md:grid-cols-2 max-w-6xl mx-auto">
+    <!-- Report Types -->
+    <div class="bg-white rounded-lg shadow p-4">
+      <h2 class="text-xl font-semibold mb-2">Assistance Types</h2>
+      <canvas id="typeChart"></canvas>
+    </div>
+
+    <!-- Status -->
+    <div class="bg-white rounded-lg shadow p-4">
+      <h2 class="text-xl font-semibold mb-2">Report Status</h2>
+      <canvas id="statusChart"></canvas>
+    </div>
+
+    <!-- Time Series -->
+    <div class="bg-white rounded-lg shadow p-4 md:col-span-2">
+      <h2 class="text-xl font-semibold mb-2">Reports Over Time</h2>
+      <canvas id="timeChart"></canvas>
+    </div>
+
+    <!-- Geographical Heatmap -->
+    <div class="bg-white rounded-lg shadow p-4 md:col-span-2">
+      <h2 class="text-xl font-semibold mb-2">Geographical Heatmap</h2>
+      <div id="heatmap"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="text-center mt-12 text-sm text-gray-500 select-none">
+    &copy; 2025 SwiftPatch
+  </footer>
+
+  <!-- JS: Charts -->
+  <script>
+    const typeChart = new Chart(document.getElementById("typeChart"), {
+      type: "pie",
+      data: {
+        labels: {{ stats.by_type.keys()|list|tojson }},
+        datasets: [{
+          data: {{ stats.by_type.values()|list|tojson }},
+          backgroundColor: ["#2E86AB", "#E74C3C", "#27AE60", "#8E44AD"]
+        }]
+      }
+    });
+
+    const statusChart = new Chart(document.getElementById("statusChart"), {
+      type: "doughnut",
+      data: {
+        labels: {{ stats.by_status.keys()|list|tojson }},
+        datasets: [{
+          data: {{ stats.by_status.values()|list|tojson }},
+          backgroundColor: ["#F1C40F", "#E67E22"]
+        }]
+      }
+    });
+
+    const timeChart = new Chart(document.getElementById("timeChart"), {
+      type: "line",
+      data: {
+        labels: {{ stats.dates|tojson }},
+        datasets: [{
+          label: "Reports Submitted",
+          data: {{ stats.time_counts|tojson }},
+          fill: true,
+          borderColor: "#2980B9",
+          backgroundColor: "rgba(52, 152, 219, 0.3)",
+          tension: 0.2
+        }]
+      }
+    });
+  </script>
+
+  <!-- JS: Heatmap -->
+  <script>
+    const map = L.map('heatmap').setView([20.59, 78.96], 5);  // India center
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const heatPoints = {{ stats.heatmap_points|tojson }};
+    L.heatLayer(heatPoints, { radius: 25, blur: 15 }).addTo(map);
+  </script>
+</body>
+</html>

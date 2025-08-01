@@ -71,7 +71,6 @@ def update_status():
     data = load_data()
     updated = False
     for report in data:
-        # Match report by lat, lng, and timestamp
         if report.get("lat") == lat and report.get("lng") == lng and report.get("timestamp") == timestamp:
             report["status"] = new_status
             updated = True
@@ -82,10 +81,6 @@ def update_status():
 
     save_data(data)
     return jsonify({"success": True})
-
-
-
-# === New OTP API endpoints ===
 
 @app.route("/api/send_otp", methods=["POST"])
 def send_otp():
@@ -116,6 +111,50 @@ def verify_otp():
     else:
         return jsonify(success=False, error="Invalid OTP"), 400
 
+@app.route("/reports")
+def reports():
+    data = load_data()
+
+    types = ["Food Assistance", "Medical Help", "Education Support", "Shelter or Clothing"]
+    statuses = ["resolved", "unresolved"]
+
+    by_type = {t: 0 for t in types}
+    by_status = {s: 0 for s in statuses}
+    time_series = {}
+    heatmap_points = []
+
+    for r in data:
+        # Count by type and status
+        if r["type"] in by_type:
+            by_type[r["type"]] += 1
+        if r["status"] in by_status:
+            by_status[r["status"]] += 1
+
+        # Time series
+        day = r["timestamp"][:10]
+        time_series[day] = time_series.get(day, 0) + 1
+
+        # Heatmap
+        try:
+            heatmap_points.append([
+                float(r["lat"]),
+                float(r["lng"]),
+                0.5  # weight
+            ])
+        except:
+            continue
+
+    sorted_dates = sorted(time_series.keys())
+    time_counts = [time_series[d] for d in sorted_dates]
+
+    return render_template("reports.html", stats={
+        "by_type": by_type,
+        "by_status": by_status,
+        "dates": sorted_dates,
+        "time_counts": time_counts,
+        "heatmap_points": heatmap_points,
+        "total": len(data)
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)), debug=True)
